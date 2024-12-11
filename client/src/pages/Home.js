@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import api from '../utils/axios'; 
 import Post from '../components/Post';
 import CreatePost from '../components/CreatePost';
 import { useAuth } from '../context/AuthContext';
@@ -10,16 +11,12 @@ const Home = () => {
 
   const fetchPosts = async () => {
     try {
-      const response = await axios.get('/api/posts');
+      const response = await api.get('/posts');
       setPosts(response.data);
     } catch (error) {
       console.error('Error fetching posts:', error);
     }
   };
-
-  useEffect(() => {
-    fetchPosts();
-  }, []);
 
   return (
     <div className="container mx-auto max-w-2xl p-4">
