@@ -3,19 +3,19 @@ const jwt = require('jsonwebtoken');
 
 const auth = async (req, res, next) => {
     try {
-        console.log('Auth Middleware - Cookies:', req.cookies);
-        console.log('Auth Middleware - Headers:', req.headers);
-
-        const token = req.cookies.token || req.headers.authorization?.replace('Bearer ', '');
+        console.log('Checking auth token...');
+        console.log('Cookies received:', req.cookies);
+        
+        const token = req.cookies.token;
         
         if (!token) {
-            console.log('No token found');
+            console.log('No token found in cookies');
             return res.status(401).json({ message: 'No auth token, authorization denied' });
         }
 
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            console.log('Token verified, user ID:', decoded.userId);
+            console.log('Token verified successfully, user ID:', decoded.userId);
             req.userId = decoded.userId;
             next();
         } catch (e) {
@@ -27,5 +27,3 @@ const auth = async (req, res, next) => {
         res.status(500).json({ message: 'Server Error' });
     }
 };
-
-module.exports = auth;

@@ -33,6 +33,7 @@ router.use((req, res, next) => {
   next();
 });
 
+// server/routes/auth.js
 router.post('/login', async (req, res) => {
   try {
       const { username, password } = req.body;
@@ -49,16 +50,16 @@ router.post('/login', async (req, res) => {
           { expiresIn: '7d' }
       );
 
-      // Set cookie with appropriate options
+      // Use the same cookie settings that worked in our test
       res.cookie('token', token, {
           httpOnly: true,
           secure: true,
           sameSite: 'none',
-          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-          path: '/'
+          path: '/',
+          maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
       });
 
-      console.log('Login successful, token set');
+      console.log('Setting auth token cookie');
 
       res.json({
           _id: user._id,

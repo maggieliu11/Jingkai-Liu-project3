@@ -1,4 +1,4 @@
-// src/utils/axios.js
+// client/src/utils/axios.js
 import axios from 'axios';
 
 const api = axios.create({
@@ -7,19 +7,29 @@ const api = axios.create({
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
-    },
-    credentials: 'include'
+    }
 });
 
-// Add a response interceptor for debugging
-api.interceptors.response.use(
-    response => response,
+// Add request interceptor for debugging
+api.interceptors.request.use(
+    config => {
+        console.log('Making request to:', config.url);
+        return config;
+    },
     error => {
-        console.error('API Error:', {
-            config: error.config,
-            response: error.response?.data,
-            status: error.response?.status
-        });
+        console.error('Request error:', error);
+        return Promise.reject(error);
+    }
+);
+
+// Add response interceptor for debugging
+api.interceptors.response.use(
+    response => {
+        console.log('Received response from:', response.config.url);
+        return response;
+    },
+    error => {
+        console.error('Response error:', error);
         return Promise.reject(error);
     }
 );
