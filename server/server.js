@@ -16,13 +16,20 @@ const allowedOrigins = [
   'https://twitter-clone-frontend-u30x.onrender.com' 
 ];
 
+// In server.js, update the CORS configuration
 app.use(cors({
   origin: process.env.CLIENT_URL,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: ['set-cookie']
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+  exposedHeaders: ['Set-Cookie'],
 }));
+
+// Add this right after CORS configuration
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Credentials', 'true');
+  next();
+});
 
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.path}`, {
@@ -79,4 +86,15 @@ app.use((req, res) => {
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+});
+
+// Add this to server.js
+app.get('/api/test-cookie', (req, res) => {
+  res.cookie('test-cookie', 'test-value', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: 1000 * 60 * 5 // 5 minutes
+  });
+  res.json({ message: 'Test cookie set' });
 });

@@ -1,15 +1,21 @@
+// server/middleware/auth.js
 const jwt = require('jsonwebtoken');
 
 const auth = async (req, res, next) => {
     try {
-        const token = req.cookies.token || req.header('Authorization')?.replace('Bearer ', '');
+        console.log('Auth Middleware - Cookies:', req.cookies);
+        console.log('Auth Middleware - Headers:', req.headers);
+
+        const token = req.cookies.token || req.headers.authorization?.replace('Bearer ', '');
         
         if (!token) {
+            console.log('No token found');
             return res.status(401).json({ message: 'No auth token, authorization denied' });
         }
 
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            console.log('Token verified, user ID:', decoded.userId);
             req.userId = decoded.userId;
             next();
         } catch (e) {

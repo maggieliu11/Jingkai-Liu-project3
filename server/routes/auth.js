@@ -23,32 +23,42 @@ router.post('/register', async (req, res) => {
   }
 });
 
+router.use((req, res, next) => {
+  console.log('Auth Route:', {
+      path: req.path,
+      method: req.method,
+      cookies: req.cookies,
+      headers: req.headers
+  });
+  next();
+});
 
 router.post('/login', async (req, res) => {
   try {
       const { username, password } = req.body;
-      
+      console.log('Login attempt for:', username);
+
       const user = await User.findOne({ username });
-      if (!user) {
+      if (!user || !(await user.comparePassword(password))) {
           return res.status(400).json({ message: 'Invalid credentials' });
       }
 
-      const isMatch = await user.comparePassword(password);
-      if (!isMatch) {
-          return res.status(400).json({ message: 'Invalid credentials' });
-      }
+      const token = jwt.sign(
+          { userId: user._id },
+          process.env.JWT_SECRET,
+          { expiresIn: '7d' }
+      );
 
-      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-          expiresIn: '7d'
-      });
-
+      // Set cookie with appropriate options
       res.cookie('token', token, {
           httpOnly: true,
           secure: true,
           sameSite: 'none',
-          maxAge: 7 * 24 * 60 * 60 * 1000,
-          domain: '.onrender.com'
+          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+          path: '/'
       });
+
+      console.log('Login successful, token set');
 
       res.json({
           _id: user._id,
@@ -61,20 +71,19 @@ router.post('/login', async (req, res) => {
   }
 });
 
-router.post('/logout', (req, res) => {
-  res.cookie('token', '', {
-    httpOnly: true,
-    expires: new Date(0)
-  });
-  res.json({ message: 'Logged out successfully' });
-});
-
 router.get('/me', auth, async (req, res) => {
   try {
-    const user = await User.findById(req.userId).select('-password');
-    res.json(user);
+      console.log('Checking auth status. User ID:', req.userId);
+      
+      const user = await User.findById(req.userId).select('-password');
+      if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+      }
+      
+      res.json(user);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching user' });
+      console.error('Error in /me route:', error);
+      res.status(500).json({ message: 'Error fetching user' });
   }
 });
 
