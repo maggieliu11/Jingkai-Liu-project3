@@ -1,41 +1,48 @@
 // server/routes/admin.js
 const express = require('express');
+const router = express.Router();
 const Post = require('../models/Post');
 const User = require('../models/User');
-const router = express.Router();
+const auth = require('../middleware/auth');
 
-// Admin middleware - Add your admin check
-const isAdmin = (req, res, next) => {
-    // List of admin usernames or IDs
-    const adminUsers = ['MaggieL']; // Replace with your username
-    if (adminUsers.includes(req.user.username)) {
-        next();
-    } else {
-        res.status(403).json({ message: 'Admin access required' });
+// Admin middleware
+const isAdmin = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.userId);
+        if (user && user.username === 'MaggieL') {
+            next();
+        } else {
+            res.status(403).json({ message: 'Admin access required' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Error checking admin status' });
     }
 };
 
-// Delete any post by ID
-router.delete('/posts/:id', isAdmin, async (req, res) => {
+// Admin delete post route
+router.delete('/posts/:id', auth, isAdmin, async (req, res) => {
     try {
-        await Post.findByIdAndDelete(req.params.id);
+        console.log('Admin attempting to delete post:', req.params.id);
+        const post = await Post.findById(req.params.id);
+        if (!post) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+
+        await Post.deleteOne({ _id: post._id });
         res.json({ message: 'Post deleted successfully' });
     } catch (error) {
+        console.error('Admin delete error:', error);
         res.status(500).json({ message: 'Error deleting post' });
     }
 });
 
-// Delete all posts by a specific user
-router.delete('/users/:username/posts', isAdmin, async (req, res) => {
+// Get all posts (admin only)
+router.get('/posts', auth, isAdmin, async (req, res) => {
     try {
-        const user = await User.findOne({ username: req.params.username });
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-        await Post.deleteMany({ user: user._id });
-        res.json({ message: 'All posts deleted for user' });
+        const posts = await Post.find().populate('user', 'username');
+        res.json(posts);
     } catch (error) {
-        res.status(500).json({ message: 'Error deleting posts' });
+        res.status(500).json({ message: 'Error fetching posts' });
     }
 });
 

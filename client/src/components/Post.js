@@ -28,20 +28,20 @@ const Post = ({ post, onPostUpdated, onPostDeleted }) => {
 
   const handleDelete = async () => {
     try {
-      setError('');
-      if (isAdmin) {
-        // Use admin delete endpoint
-        await api.delete(`/api/admin/posts/${post._id}`);
-      } else {
-        // Use regular delete endpoint
-        await api.delete(`/api/posts/${post._id}`);
-      }
-      onPostDeleted();
+        setError('');
+        if (isAdmin && user.username !== post.user.username) {
+            // Admin deleting someone else's post
+            await api.delete(`/api/admin/posts/${post._id}`);
+        } else {
+            // Regular delete (own post)
+            await api.delete(`/api/posts/${post._id}`);
+        }
+        onPostDeleted();
     } catch (error) {
-      console.error('Error deleting post:', error);
-      setError(error.response?.data?.message || 'Error deleting post');
+        console.error('Error deleting post:', error);
+        setError(error.response?.data?.message || 'Error deleting post');
     }
-  };
+};
 
   const handleLike = async () => {
     if (!user) {
