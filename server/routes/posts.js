@@ -107,4 +107,61 @@ router.delete('/:id', auth, async (req, res) => {
     }
 });
 
+// In server/routes/posts.js, add these routes:
+
+// Like a post
+router.post('/:id/like', auth, async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+        if (!post) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+
+        // Check if already liked
+        if (post.likes.includes(req.userId)) {
+            return res.status(400).json({ message: 'Post already liked' });
+        }
+
+        post.likes.push(req.userId);
+        await post.save();
+
+        const updatedPost = await Post.findById(post._id)
+            .populate('user', 'username')
+            .populate('likes', 'username');
+
+        res.json(updatedPost);
+    } catch (error) {
+        console.error('Error liking post:', error);
+        res.status(500).json({ message: 'Error liking post' });
+    }
+});
+
+// Unlike a post
+router.delete('/:id/like', auth, async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+        if (!post) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+
+        // Remove like
+        const likeIndex = post.likes.indexOf(req.userId);
+        if (likeIndex === -1) {
+            return res.status(400).json({ message: 'Post not liked yet' });
+        }
+
+        post.likes.splice(likeIndex, 1);
+        await post.save();
+
+        const updatedPost = await Post.findById(post._id)
+            .populate('user', 'username')
+            .populate('likes', 'username');
+
+        res.json(updatedPost);
+    } catch (error) {
+        console.error('Error unliking post:', error);
+        res.status(500).json({ message: 'Error unliking post' });
+    }
+});
+
 module.exports = router;
