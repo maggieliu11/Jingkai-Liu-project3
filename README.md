@@ -9,7 +9,7 @@ A full-stack social media application built with the MERN stack (MongoDB, Expres
 - **User Authentication**
   - Secure registration and login
   - Persistent sessions using JWT tokens
-  - Cross-browser support (optimal performance on Chrome and Firefox)
+  - Cross-browser support
 
 - **Post Management**
   - Create, read, update, and delete posts
@@ -59,8 +59,8 @@ Visit the live application: [Twitter Clone](https://twitter-clone-frontend-u30x.
 
 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/twitter-clone.git
-cd twitter-clone
+git clone https://github.com/yourusername/twitter-clone.git](https://github.com/maggieliu11/twitter-clone-Maggie-Tech-Blog.git
+cd twitter-clone-Maggie-Tech-Blog
 ```
 
 2. Install dependencies for both frontend and backend
