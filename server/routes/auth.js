@@ -25,36 +25,37 @@ router.post('/register', async (req, res) => {
 
 router.post('/login', async (req, res) => {
   try {
-    const { username, password } = req.body;
-    
-    const user = await User.findOne({ username });
-    if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
+      const { username, password } = req.body;
+      
+      const user = await User.findOne({ username });
+      if (!user) {
+          return res.status(400).json({ message: 'Invalid credentials' });
+      }
 
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
+      const isMatch = await user.comparePassword(password);
+      if (!isMatch) {
+          return res.status(400).json({ message: 'Invalid credentials' });
+      }
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: '7d'
-    });
+      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+          expiresIn: '7d'
+      });
 
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000 
-    });
+      res.cookie('token', token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production', 
+          sameSite: 'none', 
+          maxAge: 7 * 24 * 60 * 60 * 1000
+      });
 
-    res.json({
-      _id: user._id,
-      username: user.username,
-      description: user.description
-    });
+      res.json({
+          _id: user._id,
+          username: user.username,
+          description: user.description
+      });
   } catch (error) {
-    res.status(500).json({ message: 'Error logging in' });
+      console.error('Login error:', error);
+      res.status(500).json({ message: 'Error logging in' });
   }
 });
 

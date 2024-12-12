@@ -11,34 +11,33 @@ const userRoutes = require('./routes/users');
 const app = express();
 
 // Middleware
+const allowedOrigins = [
+  'http://localhost:3000', 
+  'https://twitter-clone-frontend-u30x.onrender.com' 
+];
+
+app.use(cors({
+  origin: process.env.CLIENT_URL,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-requested-with']
+}));
+
+app.options('*', cors());
+
+// Middleware setup
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({
-  origin: 'https://twitter-clone-frontend-u30x.onrender.com', 
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
 
 // MongoDB connection
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
     console.log('Connected to MongoDB successfully');
-    
-    mongoose.connection.db.listCollections().toArray()
-      .then(collections => {
-        console.log('Available collections:', collections.map(c => c.name));
-      });
   })
   .catch(err => {
     console.error('MongoDB connection error:', err);
     process.exit(1);
   });
-
-// Add error handler
-mongoose.connection.on('error', err => {
-  console.error('MongoDB error:', err);
-});
 
 // Routes
 app.use('/api/auth', authRoutes);
