@@ -1,6 +1,7 @@
+// src/pages/UserProfile.js
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
+import api from '../utils/axios';
 import Post from '../components/Post';
 import { useAuth } from '../context/AuthContext';
 
@@ -11,14 +12,18 @@ const UserProfile = () => {
   const [description, setDescription] = useState('');
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
   const { user: currentUser } = useAuth();
 
   const fetchUserData = async () => {
     try {
       setError(null);
+      setLoading(true);
+      console.log('Fetching data for username:', username);
+      
       const [userResponse, postsResponse] = await Promise.all([
-        axios.get(`/api/users/${username}`),
-        axios.get(`/api/posts/user/${username}`)
+        api.get(`/api/users/${username}`),
+        api.get(`/api/posts/user/${username}`)
       ]);
       
       setUser(userResponse.data);
@@ -27,8 +32,8 @@ const UserProfile = () => {
     } catch (error) {
       console.error('Error fetching user data:', error);
       setError(error.response?.data?.message || 'Error loading profile');
-      setUser(null);
-      setPosts([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -38,17 +43,22 @@ const UserProfile = () => {
 
   const handleUpdateDescription = async () => {
     try {
-      await axios.put('/api/users/description', 
-        { description }, 
-        { withCredentials: true }
-      );
+      await api.put('/api/users/description', { description });
       setIsEditingDescription(false);
       fetchUserData();
     } catch (error) {
       console.error('Error updating description:', error);
-      alert(error.response?.data?.message || 'Error updating description');
+      setError(error.response?.data?.message || 'Error updating description');
     }
   };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto max-w-2xl p-4 text-center">
+        Loading...
+      </div>
+    );
+  }
 
   if (error) {
     return (
@@ -63,7 +73,7 @@ const UserProfile = () => {
   if (!user) {
     return (
       <div className="container mx-auto max-w-2xl p-4 text-center">
-        Loading...
+        User not found
       </div>
     );
   }
