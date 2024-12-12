@@ -20,8 +20,18 @@ app.use(cors({
   origin: process.env.CLIENT_URL,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-requested-with']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['set-cookie']
 }));
+
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path}`, {
+      body: req.body,
+      cookies: req.cookies,
+      headers: req.headers
+  });
+  next();
+});
 
 app.options('*', cors());
 

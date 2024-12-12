@@ -1,6 +1,5 @@
 import { createContext, useState, useContext, useEffect } from 'react';
-import axios from 'axios';
-import api from '../utils/axios'; 
+import api from '../utils/axios';
 
 const AuthContext = createContext();
 
@@ -14,24 +13,26 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuth = async () => {
     try {
-      const response = await api.get('/auth/me');
+      const response = await api.get('/api/auth/me');
       setUser(response.data);
     } catch (error) {
+      console.error('Auth check error:', error);
       setUser(null);
     }
     setLoading(false);
   };
-  
+
   const login = async (username, password) => {
-    const response = await axios.post('/api/auth/login', {
+    const response = await api.post('/api/auth/login', {
       username,
       password
-    }, { withCredentials: true });
+    });
     setUser(response.data);
+    await checkAuth(); // Add this to verify the auth state
   };
 
   const logout = async () => {
-    await axios.post('/api/auth/logout', {}, { withCredentials: true });
+    await api.post('/api/auth/logout');
     setUser(null);
   };
 

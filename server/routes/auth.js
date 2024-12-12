@@ -23,6 +23,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
+
 router.post('/login', async (req, res) => {
   try {
       const { username, password } = req.body;
@@ -43,9 +44,10 @@ router.post('/login', async (req, res) => {
 
       res.cookie('token', token, {
           httpOnly: true,
-          secure: process.env.NODE_ENV === 'production', 
-          sameSite: 'none', 
-          maxAge: 7 * 24 * 60 * 60 * 1000
+          secure: true,
+          sameSite: 'none',
+          maxAge: 7 * 24 * 60 * 60 * 1000,
+          domain: '.onrender.com'
       });
 
       res.json({
