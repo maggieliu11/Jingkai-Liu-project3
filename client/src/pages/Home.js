@@ -38,3 +38,5 @@ const Home = () => {
     </div>
   );
 };
+
+export default Home;  // Added default export
