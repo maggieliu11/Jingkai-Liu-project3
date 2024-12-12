@@ -1,4 +1,3 @@
-
 // server/routes/auth.js
 const express = require('express');
 const jwt = require('jsonwebtoken');
@@ -22,6 +21,10 @@ router.post('/register', async (req, res) => {
         console.log('Registration attempt:', req.body.username);
         const { username, password } = req.body;
         
+        if (!username || !password) {
+            return res.status(400).json({ message: 'Username and password are required' });
+        }
+
         const existingUser = await User.findOne({ username });
         if (existingUser) {
             return res.status(400).json({ message: 'Username already exists' });
@@ -43,6 +46,10 @@ router.post('/login', async (req, res) => {
         console.log('Login attempt for:', req.body.username);
         const { username, password } = req.body;
         
+        if (!username || !password) {
+            return res.status(400).json({ message: 'Username and password are required' });
+        }
+
         const user = await User.findOne({ username });
         if (!user) {
             console.log('User not found:', username);
@@ -82,15 +89,20 @@ router.post('/login', async (req, res) => {
 });
 
 router.post('/logout', (req, res) => {
-    console.log('Logout attempt');
-    res.cookie('token', '', {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'none',
-        path: '/',
-        expires: new Date(0)
-    });
-    res.json({ message: 'Logged out successfully' });
+    try {
+        console.log('Logout attempt');
+        res.cookie('token', '', {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none',
+            path: '/',
+            expires: new Date(0)
+        });
+        res.json({ message: 'Logged out successfully' });
+    } catch (error) {
+        console.error('Logout error:', error);
+        res.status(500).json({ message: 'Error logging out' });
+    }
 });
 
 router.get('/me', auth, async (req, res) => {
