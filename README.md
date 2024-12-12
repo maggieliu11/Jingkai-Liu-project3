@@ -59,7 +59,7 @@ Visit the live application: [Twitter Clone](https://twitter-clone-frontend-u30x.
 
 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/twitter-clone.git](https://github.com/maggieliu11/twitter-clone-Maggie-Tech-Blog.git
+git clone https://github.com/maggieliu11/twitter-clone-Maggie-Tech-Blog.git
 cd twitter-clone-Maggie-Tech-Blog
 ```
 
