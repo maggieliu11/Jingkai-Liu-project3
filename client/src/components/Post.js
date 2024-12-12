@@ -12,6 +12,7 @@ const Post = ({ post, onPostUpdated, onPostDeleted }) => {
   const [isLiked, setIsLiked] = useState(post.likes?.includes(user?._id));
   const [likeCount, setLikeCount] = useState(post.likes?.length || 0);
   const [error, setError] = useState('');
+  const isAdmin = user?.username === 'MaggieL';
 
   const handleUpdate = async () => {
     try {
@@ -28,7 +29,13 @@ const Post = ({ post, onPostUpdated, onPostDeleted }) => {
   const handleDelete = async () => {
     try {
       setError('');
-      await api.delete(`/api/posts/${post._id}`);
+      if (isAdmin) {
+        // Use admin delete endpoint
+        await api.delete(`/api/admin/posts/${post._id}`);
+      } else {
+        // Use regular delete endpoint
+        await api.delete(`/api/posts/${post._id}`);
+      }
       onPostDeleted();
     } catch (error) {
       console.error('Error deleting post:', error);
@@ -112,19 +119,22 @@ const Post = ({ post, onPostUpdated, onPostDeleted }) => {
               <span>{likeCount}</span>
             </button>
             
-            {user && user.username === post.user.username && (
+            {/* Show delete/edit buttons for post owner or admin */}
+            {(user?.username === post.user.username || isAdmin) && (
               <div className="space-x-2">
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="text-blue-500"
-                >
-                  Edit
-                </button>
+                {user?.username === post.user.username && (
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="text-blue-500"
+                  >
+                    Edit
+                  </button>
+                )}
                 <button
                   onClick={handleDelete}
-                  className="text-red-500"
+                  className={isAdmin ? "text-red-600 font-bold" : "text-red-500"}
                 >
-                  Delete
+                  {isAdmin && user?.username !== post.user.username ? "Admin Delete" : "Delete"}
                 </button>
               </div>
             )}
