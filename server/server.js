@@ -11,7 +11,7 @@ const adminRoutes = require('./routes/admin');
 
 const app = express();
 
-// Middleware setup - order is important
+// Middleware setup
 app.use(express.json());
 app.use(cookieParser());
 
@@ -34,23 +34,22 @@ app.use((req, res, next) => {
 });
 
 // Test routes
-app.get('/api/test-cookie', (req, res) => {
-    // Set a test cookie
-    res.cookie('test-cookie', 'test-value', {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'none',
-        path: '/',
-        maxAge: 300000 // 5 minutes
-    });
-    console.log('Setting test cookie');
-    res.json({ message: 'Test cookie set' });
-});
+// app.get('/api/test-cookie', (req, res) => {
+//     res.cookie('test-cookie', 'test-value', {
+//         httpOnly: true,
+//         secure: true,
+//         sameSite: 'none',
+//         path: '/',
+//         maxAge: 300000
+//     });
+//     console.log('Setting test cookie');
+//     res.json({ message: 'Test cookie set' });
+// });
 
-app.get('/api/check-cookie', (req, res) => {
-    console.log('Cookies received:', req.cookies);
-    res.json({ cookies: req.cookies });
-});
+// app.get('/api/check-cookie', (req, res) => {
+//     console.log('Cookies received:', req.cookies);
+//     res.json({ cookies: req.cookies });
+// });
 
 // Main routes
 app.use('/api/auth', authRoutes);
@@ -82,7 +81,7 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Handle 404 - This should be the last middleware
+// Handle 404
 app.use((req, res) => {
     console.log('404 Not Found:', req.path);
     res.status(404).json({ message: 'Route not found' });

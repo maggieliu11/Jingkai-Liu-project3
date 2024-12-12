@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
       password
     });
     setUser(response.data);
-    await checkAuth(); // Add this to verify the auth state
+    await checkAuth(); 
   };
 
   const logout = async () => {

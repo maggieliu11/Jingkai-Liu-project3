@@ -1,4 +1,3 @@
-// server/routes/posts.js
 const express = require('express');
 const Post = require('../models/Post');
 const User = require('../models/User');
@@ -106,8 +105,6 @@ router.delete('/:id', auth, async (req, res) => {
         res.status(500).json({ message: 'Error deleting post' });
     }
 });
-
-// In server/routes/posts.js, add these routes:
 
 // Like a post
 router.post('/:id/like', auth, async (req, res) => {

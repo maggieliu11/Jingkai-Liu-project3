@@ -1,4 +1,3 @@
-// src/components/CreatePost.js
 import { useState } from 'react';
 import api from '../utils/axios';
 
@@ -41,7 +40,7 @@ const CreatePost = ({ onPostCreated }) => {
           className="bg-blue-500 text-white px-4 py-2 rounded-lg disabled:opacity-50"
           disabled={!content.trim()}
         >
-          Tweet
+          Status Update
         </button>
       </div>
     </form>

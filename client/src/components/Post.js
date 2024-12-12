@@ -1,4 +1,3 @@
-// src/components/Post.js
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -45,7 +44,6 @@ const Post = ({ post, onPostUpdated, onPostDeleted }) => {
 
   const handleLike = async () => {
     if (!user) {
-      // Could add a redirect to login here
       return;
     }
 

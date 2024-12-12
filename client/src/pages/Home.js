@@ -1,4 +1,3 @@
-// src/pages/Home.js
 import { useState, useEffect } from 'react';
 import api from '../utils/axios';
 import Post from '../components/Post';
@@ -39,4 +38,4 @@ const Home = () => {
   );
 };
 
-export default Home;  // Added default export
+export default Home;
